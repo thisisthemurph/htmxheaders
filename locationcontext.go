@@ -2,6 +2,7 @@ package htmxheaders
 
 // LocationContext represents additional optional context that can
 // be provided within the LocationWithContext method
+// https://htmx.org/headers/hx-location/
 type LocationContext struct {
 	// the source element of the request
 	Source string `json:"source,omitempty"`
