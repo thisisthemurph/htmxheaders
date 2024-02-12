@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type DecoratorFunction func(w http.ResponseWriter) error
@@ -143,6 +144,33 @@ func Retarget(target string) DecoratorFunction {
 // https://htmx.org/reference/#response_headers
 func Reselect(selector string) DecoratorFunction {
 	return AddCustomHeader("HX-Reselect", selector)
+}
+
+func Trigger(eventName ...string) DecoratorFunction {
+	events := strings.Join(eventName, ", ")
+	return AddCustomHeader("HX-Trigger", events)
+}
+
+type TriggerEvent struct {
+	Name    string
+	Details any
+}
+
+func TriggerWithDetails(events ...TriggerEvent) DecoratorFunction {
+	return func(w http.ResponseWriter) error {
+		eventMap := map[string]interface{}{}
+		for _, event := range events {
+			eventMap[event.Name] = event.Details
+		}
+
+		jsonData, err := json.Marshal(eventMap)
+		if err != nil {
+			return err
+		}
+
+		w.Header().Set("HX-Trigger", string(jsonData))
+		return nil
+	}
 }
 
 // RemoveHXHeaders removes all HTMX-related headers from the provided http.ResponseWriter.
