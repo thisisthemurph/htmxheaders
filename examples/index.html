@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTMX Headers Example</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <style>
+        section {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Send a message to the server</h1>
+    <form hx-post="/send" hx-swap="none">
+        <p id="error"></p>
+
+        <section>
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" />
+        </section>
+
+        <section>
+            <label for="message">Message</label>
+            <textarea id="message" name="message"></textarea>
+        </section>
+
+        <button type="submit">Send message</button>
+    </form>
+</body>
+</html>
