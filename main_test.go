@@ -342,12 +342,13 @@ func TestTriggerWithDetailsHandlesMultipleEvents(t *testing.T) {
 	require.JSONEq(t, expectedJSON, actualHeader)
 }
 
-func TestClearHXHeadersRemovesHXHeaders(t *testing.T) {
+func TestRemoveHXHeadersRemovesHXHeaders(t *testing.T) {
 	w := httptest.NewRecorder()
 	w.Header().Set("HX-Location", "/some/location")
 	w.Header().Set("HX-Push-Url", "/some/url")
 
-	hh.RemoveHXHeaders(w)
+	err := hh.RemoveHXHeaders(w)
+	assert.NoError(t, err)
 
 	headersToCheck := []string{"HX-Location", "HX-Push-Url", "HX-Redirect", "HX-Refresh", "HX-Replace-Url", "HX-Reswap", "HX-Retarget", "HX-Reselect"}
 	for _, header := range headersToCheck {
@@ -357,12 +358,13 @@ func TestClearHXHeadersRemovesHXHeaders(t *testing.T) {
 	}
 }
 
-func TestClearHXHeadersDoesNotAffectNonHXHeaders(t *testing.T) {
+func TestRemoveHXHeadersDoesNotAffectNonHXHeaders(t *testing.T) {
 	w := httptest.NewRecorder()
 	w.Header().Set("Content-Type", "text/html")
 	w.Header().Set("Cache-Control", "no-cache")
 
-	hh.RemoveHXHeaders(w)
+	err := hh.RemoveHXHeaders(w)
+	assert.NoError(t, err)
 
 	nonHXHeadersToCheck := []string{"Content-Type", "Cache-Control"}
 	for _, header := range nonHXHeadersToCheck {
