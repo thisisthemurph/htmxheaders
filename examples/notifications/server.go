@@ -8,8 +8,11 @@ import (
 	"strconv"
 )
 
-// In this example, we have a form that will redirect you to the thank-you page on success using
-// the Redirect function, which sets the HX-Redirect header.
+// In this example we have a form that will send the current numeric value.
+// The handler will then increment the value and replace the input element with
+// a partial containing the new value.
+// If the value is divisible by 3, the `HX-Trigger` header will be set with a message
+// to be presented to the user using the JS alert method; see the `index.html`.
 //
 // If there is an issue with the form data, an error message partial will instead be returned
 // and presented above the form using the `Reswap` and `Retarget` functions to set the `Re-Swap`
@@ -21,19 +24,21 @@ func main() {
 
 	http.HandleFunc("/inc", func(w http.ResponseWriter, r *http.Request) {
 		val, _ := strconv.Atoi(r.FormValue("value"))
-		data := struct{ Value string }{strconv.Itoa(val + 1)}
 
 		if (val+1)%3 == 0 {
-			fmt.Printf("%v is divisible by 3.\n", val+1)
-			hh.SetResponseHeaders(hh.)
+			// Create a message and add it to the detail of the `showAlert` event.
+			// The details can be anything that can be serialized into JSON.
+			// Here we are just using a simple string, but it could be anything.
+			message := fmt.Sprintf("Number %v is divisible by 3!", val+1)
+			event := hh.TriggerEvent{Name: "showAlert", Detail: message}
+			_ = hh.SetResponseHeaders(w, hh.TriggerWithDetails(event))
 		}
 
-		renderPartial(w, "input.html", data)
+		// We continue with our normal rendering in this example, but you may wish to do something
+		// else depending on your use case.
+		partialData := struct{ Value string }{strconv.Itoa(val + 1)}
+		renderPartial(w, "input.html", partialData)
 		return
-	})
-
-	http.HandleFunc("/thankyou", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "thankyou.html")
 	})
 
 	http.ListenAndServe(":3000", nil)

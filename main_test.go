@@ -279,19 +279,19 @@ func TestTriggerWithDetails(t *testing.T) {
 		{
 			Name: "Single event with string details",
 			Event: hh.TriggerEvent{
-				Name: "event1", Details: "details1",
+				Name: "event1", Detail: "details1",
 			},
 		},
 		{
 			Name: "Single event with int details",
 			Event: hh.TriggerEvent{
-				Name: "event2", Details: 123,
+				Name: "event2", Detail: 123,
 			},
 		},
 		{
 			Name: "Single event with map details",
 			Event: hh.TriggerEvent{
-				Name: "event3", Details: map[string]interface{}{"key": "value"},
+				Name: "event3", Detail: map[string]interface{}{"key": "value"},
 			},
 		},
 	}
@@ -306,7 +306,7 @@ func TestTriggerWithDetails(t *testing.T) {
 			assert.NoError(t, err)
 
 			// Check if the HX-Trigger header is set correctly
-			expectedHeader := map[string]interface{}{tc.Event.Name: tc.Event.Details}
+			expectedHeader := map[string]interface{}{tc.Event.Name: tc.Event.Detail}
 			expectedHeaderValue, err := json.Marshal(expectedHeader)
 			assert.NoError(t, err)
 			actualHeaderValue := w.Header().Get("HX-Trigger")
@@ -320,16 +320,16 @@ func TestTriggerWithDetails(t *testing.T) {
 func TestTriggerWithDetailsHandlesMultipleEvents(t *testing.T) {
 	events := []hh.TriggerEvent{
 		hh.TriggerEvent{
-			Name:    "event1",
-			Details: "details1",
+			Name:   "event1",
+			Detail: "details1",
 		},
 		hh.TriggerEvent{
-			Name:    "event2",
-			Details: 123,
+			Name:   "event2",
+			Detail: 123,
 		},
 		hh.TriggerEvent{
-			Name:    "event3",
-			Details: map[string]interface{}{"key": "value"},
+			Name:   "event3",
+			Detail: map[string]interface{}{"key": "value"},
 		},
 	}
 

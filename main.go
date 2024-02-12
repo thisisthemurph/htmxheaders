@@ -154,8 +154,8 @@ func Trigger(eventName ...string) DecoratorFunction {
 // TriggerEvent represents an event that can be triggered with additional details.
 // https://htmx.org/headers/hx-trigger/
 type TriggerEvent struct {
-	Name    string // Name of the event.
-	Details any    // Additional details associated with the event.
+	Name   string // Name of the event.
+	Detail any    // Additional details associated with the event.
 }
 
 // TriggerWithDetails adds an event JSON object to the response headers.
@@ -166,7 +166,7 @@ func TriggerWithDetails(events ...TriggerEvent) DecoratorFunction {
 	return func(w http.ResponseWriter) error {
 		eventMap := map[string]interface{}{}
 		for _, event := range events {
-			eventMap[event.Name] = event.Details
+			eventMap[event.Name] = event.Detail
 		}
 
 		jsonData, err := json.Marshal(eventMap)
