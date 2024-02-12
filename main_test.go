@@ -41,7 +41,7 @@ func TestLocation(t *testing.T) {
 func TestLocationWithContext(t *testing.T) {
 	w := httptest.NewRecorder()
 	path := "/some/path"
-	context := hh.LocationContext{Target: "#my-target"}
+	context := hh.LocationContext{Target: "#my-target", Swap: hh.SwapAfterBegin}
 	err := hh.SetResponseHeaders(w, hh.LocationWithContext(path, context))
 
 	if err != nil {
@@ -54,8 +54,16 @@ func TestLocationWithContext(t *testing.T) {
 		t.Errorf("Error unmarshalling HX-Location JSON: %v", err)
 	}
 
-	if data.Path != path || data.Target != context.Target {
-		t.Errorf("Expected path: %s, Method: %s, got path: %s, Method: %s", path, context.Target, data.Path, data.Target)
+	if data.Path != path {
+		t.Errorf("Expected path: %s, got path: %s", path, data.Path)
+	}
+
+	if data.Target != context.Target {
+		t.Errorf("Expected target: %s, got target: %s", context.Target, data.Target)
+	}
+
+	if data.Swap != context.Swap {
+		t.Errorf("Expected swap: %s, got swap: $%s", context.Swap, data.Swap)
 	}
 }
 

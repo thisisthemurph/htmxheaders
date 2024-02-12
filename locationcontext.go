@@ -12,11 +12,9 @@ type LocationContext struct {
 	// the target to swap the response into
 	Target string `json:"target,omitempty"`
 	// how the response will be swapped in relative to the target
-	Swap string `json:"swap,omitempty"`
+	Swap Swap `json:"swap,omitempty"`
 	// values to submit with the request
 	Values string `json:"values,omitempty"`
-	// headers to submit with the request
-	Headers string `json:"headers,omitempty"`
 	// allows you to select the content you want swapped from a response
 	Select string `json:"select,omitempty"`
 }
