@@ -301,8 +301,8 @@ func TestTriggerWithDetails(t *testing.T) {
 			// Prepare a dummy HTTP response writer
 			w := httptest.NewRecorder()
 
-			// Create a DecoratorFunction with TriggerWithDetails
-			err := hh.SetResponseHeaders(w, hh.TriggerWithDetails(tc.Event))
+			// Create a DecoratorFunction with TriggerWithDetail
+			err := hh.SetResponseHeaders(w, hh.TriggerWithDetail(tc.Event))
 			assert.NoError(t, err)
 
 			// Check if the HX-Trigger header is set correctly
@@ -334,7 +334,7 @@ func TestTriggerWithDetailsHandlesMultipleEvents(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	err := hh.SetResponseHeaders(w, hh.TriggerWithDetails(events...))
+	err := hh.SetResponseHeaders(w, hh.TriggerWithDetail(events...))
 	assert.NoError(t, err)
 
 	expectedJSON := `{"event1": "details1", "event2": 123, "event3": {"key": "value"}}`
