@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notification Example</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+</head>
+<body>
+    <h1>Notification example</h1>
+    <form hx-post="/inc" hx-target="#value" hx-swap="outerHTML">
+        <label for="value">Value</label>
+        <input type="number" id="value" name="value" value="0">
+        <button type="submit">Increase</button>
+    </form>
+    <script>
+        // EventListener triggers when the HX-Trigger header contains the `showAlert` event name.
+        document.body.addEventListener("showAlert", function (e) {
+            alert(e.detail.value);
+        });
+    </script>
+</body>
+</html>
