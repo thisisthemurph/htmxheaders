@@ -31,7 +31,7 @@ func main() {
 			// Here we are just using a simple string, but it could be anything.
 			message := fmt.Sprintf("Number %v is divisible by 3!", val+1)
 			event := hh.TriggerEvent{Name: "showAlert", Detail: message}
-			_ = hh.SetResponseHeaders(w, hh.TriggerWithDetail(event))
+			_ = hh.SetResponseHeaders(w, hh.TriggerWithDetail(hh.TriggerAfterSwap, event))
 		}
 
 		// We continue with our normal rendering in this example, but you may wish to do something

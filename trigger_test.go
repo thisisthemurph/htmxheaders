@@ -10,18 +10,31 @@ import (
 )
 
 func TestTrigger(t *testing.T) {
-	w := httptest.NewRecorder()
-	eventName := "testEvent"
-
-	err := hh.SetResponseHeaders(w, hh.Trigger(eventName))
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
+	testCases := []struct {
+		when      hh.TriggerDelay
+		eventName string
+	}{
+		{hh.TriggerImmediately, "immediateEvent"},
+		{hh.TriggerAfterSettle, "afterSettleEvent"},
+		{hh.TriggerAfterSwap, "afterSwapEvent"},
 	}
 
-	actualHeader := w.Header().Get("HX-Trigger")
-	if actualHeader != eventName {
-		t.Errorf("Expected header HX-Trigger to have value: %s, got: %s instead", eventName, actualHeader)
+	for _, tc := range testCases {
+		t.Run(tc.when.String(), func(t *testing.T) {
+			w := httptest.NewRecorder()
+
+			err := hh.SetResponseHeaders(w, hh.Trigger(tc.when, tc.eventName))
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+
+			actualHeader := w.Header().Get(tc.when.String())
+			if actualHeader != tc.eventName {
+				t.Errorf("Expected header HX-Trigger to have value: %s, got: %s instead", tc.eventName, actualHeader)
+			}
+		})
 	}
+
 }
 
 func TestTriggerWitMultipleEvents(t *testing.T) {
@@ -30,7 +43,7 @@ func TestTriggerWitMultipleEvents(t *testing.T) {
 	event2 := "event2"
 	event3 := "event3"
 
-	err := hh.SetResponseHeaders(w, hh.Trigger(event1, event2, event3))
+	err := hh.SetResponseHeaders(w, hh.Trigger(hh.TriggerImmediately, event1, event2, event3))
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -44,43 +57,50 @@ func TestTriggerWitMultipleEvents(t *testing.T) {
 
 func TestTriggerWithDetails(t *testing.T) {
 	testCases := []struct {
-		Name  string
-		Event hh.TriggerEvent
+		testName string
+		when     hh.TriggerDelay
+		event    hh.TriggerEvent
 	}{
 		{
-			Name: "Single event with string details",
-			Event: hh.TriggerEvent{
-				Name: "event1", Detail: "details1",
+			testName: "Single event with string details",
+			when:     hh.TriggerImmediately,
+			event: hh.TriggerEvent{
+				Name:   "event1",
+				Detail: "details1",
 			},
 		},
 		{
-			Name: "Single event with int details",
-			Event: hh.TriggerEvent{
-				Name: "event2", Detail: 123,
+			testName: "Single event with int details",
+			when:     hh.TriggerAfterSettle,
+			event: hh.TriggerEvent{
+				Name:   "event2",
+				Detail: 123,
 			},
 		},
 		{
-			Name: "Single event with map details",
-			Event: hh.TriggerEvent{
-				Name: "event3", Detail: map[string]interface{}{"key": "value"},
+			testName: "Single event with map details",
+			when:     hh.TriggerAfterSwap,
+			event: hh.TriggerEvent{
+				Name:   "event3",
+				Detail: map[string]interface{}{"key": "value"},
 			},
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
+		t.Run(tc.testName, func(t *testing.T) {
 			// Prepare a dummy HTTP response writer
 			w := httptest.NewRecorder()
 
 			// Create a DecoratorFunction with TriggerWithDetail
-			err := hh.SetResponseHeaders(w, hh.TriggerWithDetail(tc.Event))
+			err := hh.SetResponseHeaders(w, hh.TriggerWithDetail(tc.when, tc.event))
 			assert.NoError(t, err)
 
 			// Check if the HX-Trigger header is set correctly
-			expectedHeader := map[string]interface{}{tc.Event.Name: tc.Event.Detail}
+			expectedHeader := map[string]interface{}{tc.event.Name: tc.event.Detail}
 			expectedHeaderValue, err := json.Marshal(expectedHeader)
 			assert.NoError(t, err)
-			actualHeaderValue := w.Header().Get("HX-Trigger")
+			actualHeaderValue := w.Header().Get(tc.when.String())
 
 			require.JSONEq(t, string(expectedHeaderValue), actualHeaderValue)
 
@@ -105,7 +125,7 @@ func TestTriggerWithDetailsHandlesMultipleEvents(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	err := hh.SetResponseHeaders(w, hh.TriggerWithDetail(events...))
+	err := hh.SetResponseHeaders(w, hh.TriggerWithDetail(hh.TriggerImmediately, events...))
 	assert.NoError(t, err)
 
 	expectedJSON := `{"event1": "details1", "event2": 123, "event3": {"key": "value"}}`
