@@ -15,7 +15,7 @@ For more information on HTMX headers, read the official HTMX Response Headers Re
 To install HTMX Headers Go Package, use `go get`:
 
 ```bash
-go get github.com/thisisthemurph/htmxheaders
+go get github.com/thisisthemurph/htmxheaders@v0.1.0
 ```
 
 ## Usage
