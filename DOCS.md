@@ -361,6 +361,7 @@ official [HTMX documentation](https://htmx.org/headers/hx-trigger).
 
 **Parameters:**
 
+- `when` : `TriggerDelay` - When the event should be triggered - immediately, after the settle step, or after the swap step
 - `eventName`: `string` - The name(s) of the event(s) to trigger.
 
 **Returns:**
@@ -373,20 +374,20 @@ the response writer.
 
 ```go
 // Apply the decorator to trigger an event using SetResponseHeaders
-_ = hh.SetResponseHeaders(w, hh.Trigger("customEvent"))
+_ = hh.SetResponseHeaders(w, hh.Trigger(hh.TriggerImmediately, "customEvent"))
 ```
 
 Or you can do multiple events like:
 
 ```go
-_ = hh.SetResponseHeaders(w, hh.Trigger("customEvent", "myOtherEvent", "yetAnotherEvent"))
+_ = hh.SetResponseHeaders(w, hh.Trigger(hh.TriggerAfterSwap, "customEvent", "myOtherEvent", "yetAnotherEvent"))
 ```
 
 If your events are in a slice:
 
 ```go
 events := []string{"customEvent1", "customEvent2"}
-_ = hh.SetResponseHeaders(w, hh.Trigger(events...))
+_ = hh.SetResponseHeaders(w, hh.Trigger(hh.TriggerAfterSettle, events...))
 ```
 
 ## TriggerWithDetail
@@ -415,7 +416,7 @@ events := []hh.TriggerEvent{
 }
 
 // Apply the decorator to add event details to the response headers using SetResponseHeaders
-_ = hh.SetResponseHeaders(w, hh.TriggerWithDetail(events...))
+_ = hh.SetResponseHeaders(w, hh.TriggerWithDetail(hh.TriggerAfterSwap, events...))
 ```
 
 The detail can be any object that can be marshalled into JSON. For example, you may have an event that provides toast
@@ -433,7 +434,7 @@ events := []hh.TriggerEvent{
 	{Name: "toast", Detail: Toast{LogLevel: 1, Title: "Info", Message: "Account not created."}},
 }
 
-_ = hh.SetResponseHeaders(w, hh.TriggerWithDetail(events...))
+_ = hh.SetResponseHeaders(w, hh.TriggerWithDetail(hh.TriggerAfterSettle, events...))
 ```
 
 ## RemoveHXHeaders
