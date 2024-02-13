@@ -1,10 +1,8 @@
 package htmxheaders
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 type DecoratorFunction func(w http.ResponseWriter) error
@@ -54,127 +52,6 @@ func SetResponseHeaders(w http.ResponseWriter, decorators ...DecoratorFunction) 
 func AddCustomHeader(key, value string) DecoratorFunction {
 	return func(w http.ResponseWriter) error {
 		w.Header().Set(key, value)
-		return nil
-	}
-}
-
-// Location allows you to do a client-side redirect that does not do a full page reload.
-// https://htmx.org/headers/hx-location/
-func Location(location string) DecoratorFunction {
-	return AddCustomHeader("HX-Location", location)
-}
-
-// LocationWithContext allows you to do a client-side redirect that does not do a full page reload.
-// additional options are provided in the context.
-// https://htmx.org/headers/hx-location/
-func LocationWithContext(path string, context LocationContext) DecoratorFunction {
-	return func(w http.ResponseWriter) error {
-		data, err := json.Marshal(
-			LocationContextWithPath{
-				LocationContext: context,
-				Path:            path,
-			})
-
-		if err != nil {
-			return fmt.Errorf("error marshalling context JSON: %v", err)
-		}
-
-		w.Header().Set("HX-Location", string(data))
-		return nil
-	}
-}
-
-// PushURL pushes a new url into the history stack.
-// https://htmx.org/headers/hx-push-url/
-func PushURL(url string) DecoratorFunction {
-	return AddCustomHeader("HX-Push-Url", url)
-}
-
-// PreventPushURL prevents the browser’s history from being updated.
-// https://htmx.org/headers/hx-push-url/
-func PreventPushURL() DecoratorFunction {
-	return PushURL("false")
-}
-
-// Redirect can be used to do a client-side redirect to a new location.
-// https://htmx.org/reference/#response_headers
-func Redirect(path string) DecoratorFunction {
-	return AddCustomHeader("HX-Redirect", path)
-}
-
-// Refresh forces the client-side to do a full refresh of the page.
-// https://htmx.org/reference/#response_headers
-func Refresh() DecoratorFunction {
-	return AddCustomHeader("HX-Refresh", "true")
-}
-
-// PreventRefresh forces the client-side to do a full refresh of the page.
-// https://htmx.org/reference/#response_headers
-func PreventRefresh() DecoratorFunction {
-	return AddCustomHeader("HX-Refresh", "false")
-}
-
-// ReplaceURL replaces the current URL in the location bar.
-// https://htmx.org/headers/hx-replace-url/
-func ReplaceURL(url string) DecoratorFunction {
-	return AddCustomHeader("HX-Replace-Url", url)
-}
-
-// PreventReplaceURL replaces the current URL in the location bar.
-// https://htmx.org/headers/hx-replace-url/
-func PreventReplaceURL() DecoratorFunction {
-	return ReplaceURL("false")
-}
-
-// Reswap allows you to override how the response will be swapped.
-// https://htmx.org/reference/#response_headers
-func Reswap(swapMethod Swap) DecoratorFunction {
-	return AddCustomHeader("HX-Reswap", swapMethod.String())
-}
-
-// Retarget a CSS selector that overrides the target of the content update to
-// a different element on the page.
-// https://htmx.org/reference/#response_headers
-func Retarget(target string) DecoratorFunction {
-	return AddCustomHeader("HX-Retarget", target)
-}
-
-// Reselect a CSS selector that allows you to choose which part of the response is used to be swapped in.
-// Overrides an existing hx-select on the triggering element
-// https://htmx.org/reference/#response_headers
-func Reselect(selector string) DecoratorFunction {
-	return AddCustomHeader("HX-Reselect", selector)
-}
-
-func Trigger(eventName ...string) DecoratorFunction {
-	events := strings.Join(eventName, ", ")
-	return AddCustomHeader("HX-Trigger", events)
-}
-
-// TriggerEvent represents an event that can be triggered with additional details.
-// https://htmx.org/headers/hx-trigger/
-type TriggerEvent struct {
-	Name   string // Name of the event.
-	Detail any    // Additional details associated with the event.
-}
-
-// TriggerWithDetail adds an event JSON object to the response headers.
-// The JSON object contains a mapping of event names to their corresponding details.
-// Each TriggerEvent in the arguments specifies an event name and its associated details.
-// https://htmx.org/headers/hx-trigger/
-func TriggerWithDetail(events ...TriggerEvent) DecoratorFunction {
-	return func(w http.ResponseWriter) error {
-		eventMap := map[string]interface{}{}
-		for _, event := range events {
-			eventMap[event.Name] = event.Detail
-		}
-
-		jsonData, err := json.Marshal(eventMap)
-		if err != nil {
-			return err
-		}
-
-		w.Header().Set("HX-Trigger", string(jsonData))
 		return nil
 	}
 }

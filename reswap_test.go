@@ -2,6 +2,7 @@ package htmxheaders_test
 
 import (
 	hh "github.com/thisisthemurph/htmxheaders"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -75,5 +76,21 @@ func TestSwapFromStringWithInvalidValid(t *testing.T) {
 		if result != test.expected {
 			t.Errorf("Expected %d for string %s, got %d", test.expected, test.str, result)
 		}
+	}
+}
+
+func TestReswap(t *testing.T) {
+	w := httptest.NewRecorder()
+	swap := hh.SwapAfterBegin
+	err := hh.SetResponseHeaders(w, hh.Reswap(swap))
+
+	if err != nil {
+		t.Errorf("Refresh returned an unexpected error: %v", err)
+	}
+
+	header := w.Header().Get("HX-Reswap")
+	headerSwap, _ := hh.StringToSwap(header)
+	if headerSwap != swap {
+		t.Errorf("Expected header HX-Refresh to have value %s, got %s", swap, header)
 	}
 }

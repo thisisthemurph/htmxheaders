@@ -1,8 +1,6 @@
 package htmxheaders
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Swap represents the type of content swap method used in HTMX.
 // It enumerates different ways in which content can be swapped on the client-side
@@ -77,4 +75,10 @@ func SwapFromString(s string) (Swap, error) {
 // along with an error indicating the invalid string value.
 func StringToSwap(s string) (Swap, error) {
 	return SwapFromString(s)
+}
+
+// Reswap allows you to override how the response will be swapped.
+// https://htmx.org/reference/#response_headers
+func Reswap(swapMethod Swap) DecoratorFunction {
+	return AddCustomHeader("HX-Reswap", swapMethod.String())
 }
