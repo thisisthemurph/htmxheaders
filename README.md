@@ -20,6 +20,8 @@ go get github.com/thisisthemurph/htmxheaders
 
 ## Usage
 
+For more detailed usage, view the `DOCS.md` file.
+
 Import the htmxheaders package in your Go code:
 
 ```go
@@ -28,7 +30,7 @@ package main
 import "github.com/thisisthemurph/htmxheaders"
 ```
 
-or use an alias:
+preferably use an alias:
 
 ```go
 package main
